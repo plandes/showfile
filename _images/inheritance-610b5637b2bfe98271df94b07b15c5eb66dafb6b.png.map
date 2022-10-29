@@ -1,0 +1,12 @@
+<map id="inheritancede25d2db7f" name="inheritancede25d2db7f">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="53,5,125,31"/>
+<area shape="rect" id="node5" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="53,79,125,104"/>
+<area shape="rect" id="node2" href="#zensols.showfile.browser.Browser" target="_top" title="Browser()" alt="" coords="5,225,77,251"/>
+<area shape="rect" id="node3" title="A class that that generates a dictionary recursively from data classes and" alt="" coords="53,152,125,177"/>
+<area shape="rect" id="node7" href="#zensols.showfile.browser.Size" target="_top" title="A screen size configuration. &#160;This is created either for the current" alt="" coords="101,225,173,251"/>
+<area shape="rect" id="node4" href="#zensols.showfile.browser.BrowserManager" target="_top" title="Manages configured browsers and invoking them to display files and URLs." alt="" coords="150,5,274,31"/>
+<area shape="rect" id="node6" href="#zensols.showfile.browser.Display" target="_top" title="The screen display." alt="" coords="53,299,125,324"/>
+<area shape="rect" id="node9" href="#zensols.showfile.browser.Extent" target="_top" title="The size (parent class) and the position of the screen." alt="" coords="149,299,221,324"/>
+<area shape="rect" id="node8" title="Generic enumeration." alt="" coords="299,5,371,31"/>
+<area shape="rect" id="node10" href="#zensols.showfile.browser.LocatorType" target="_top" title="Identifies a URL or a file name." alt="" coords="287,79,383,104"/>
+</map>

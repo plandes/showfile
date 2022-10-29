@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zensols.showfile.browser &mdash; Invoke native applications to view files 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../top.html" class="icon icon-home"> Invoke native applications to view files
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Invoke native applications to view files</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>zensols.showfile.browser</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for zensols.showfile.browser</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Domain classes and the a screen manager class.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">zensols.config</span> <span class="kn">import</span> <span class="n">Dictable</span><span class="p">,</span> <span class="n">ConfigFactory</span>
+<span class="kn">from</span> <span class="nn">zensols.persist</span> <span class="kn">import</span> <span class="n">persisted</span>
+<span class="kn">from</span> <span class="nn">zensols.cli</span> <span class="kn">import</span> <span class="n">ApplicationError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LocatorType"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.LocatorType">[docs]</a><span class="k">class</span> <span class="nc">LocatorType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Identifies a URL or a file name.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Size"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Size">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Size</span><span class="p">(</span><span class="n">Dictable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A screen size configuration.  This is created either for the current</span>
+<span class="sd">    display, or one that&#39;s configured.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="si">}</span><span class="s1"> X </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+
+<div class="viewcode-block" id="Extent"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Extent">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Extent</span><span class="p">(</span><span class="n">Size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The size (parent class) and the position of the screen.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Display"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Display">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Display</span><span class="p">(</span><span class="n">Size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The screen display.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_DICTABLE_WRITE_EXCLUDES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">}</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="sd">&quot;&quot;&quot;The name of the display as the section name in the configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">target</span><span class="p">:</span> <span class="n">Extent</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="sd">&quot;&quot;&quot;The extends of the display or what to use for the Preview app.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span></div>
+
+
+<div class="viewcode-block" id="Browser"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Browser">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Browser</span><span class="p">(</span><span class="n">Dictable</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_screen_size&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">screen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Size</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the screen size for the current display.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_screen_size</span><span class="p">()</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_screen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Size</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the screen size for the current display.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_file_to_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;file://</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+
+<div class="viewcode-block" id="Browser.show_file"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Browser.show_file">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">show_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">extent</span><span class="p">:</span> <span class="n">Extent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open and resize a file.</span>
+
+<span class="sd">        :param file_name: the PDF (or image) file to resize</span>
+
+<span class="sd">        :param extent: the screen position of where to put the app</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Browser.show_url"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.Browser.show_url">[docs]</a>    <span class="k">def</span> <span class="nf">show_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extent</span><span class="p">:</span> <span class="n">Extent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open and resize a URL.</span>
+
+<span class="sd">        :param url: the URL to open</span>
+
+<span class="sd">        :param extent: the screen position of where to put the app</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="BrowserManager"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.BrowserManager">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">BrowserManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manages configured browsers and invoking them to display files and URLs.</span>
+<span class="sd">    It also contains configuration for application extents based configured</span>
+<span class="sd">    displays.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="sd">&quot;&quot;&quot;Set by the framework and used to get other configurations.&quot;&quot;&quot;</span>
+
+    <span class="n">browser</span><span class="p">:</span> <span class="n">Browser</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The platform implementation of the file browser.&quot;&quot;&quot;</span>
+
+    <span class="n">display_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The configured display names, used to fetch displays in the</span>
+<span class="sd">    configuration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">os_name</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">sec_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">os_name</span><span class="si">}</span><span class="s1">_browser&#39;</span>
+            <span class="k">if</span> <span class="n">sec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+                <span class="n">sec_name</span> <span class="o">=</span> <span class="s1">&#39;default_browser&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="p">:</span> <span class="n">Browser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="p">(</span><span class="n">sec_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BrowserManager.guess_locator_type"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.BrowserManager.guess_locator_type">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">guess_locator_type</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LocatorType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether ``s`` looks like a file or a URL.&quot;&quot;&quot;</span>
+        <span class="n">st</span><span class="p">:</span> <span class="n">LocatorType</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">result</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">netloc</span><span class="p">]):</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="n">LocatorType</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">LocatorType</span><span class="o">.</span><span class="n">file</span> <span class="k">if</span> <span class="n">st</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">st</span>
+        <span class="k">return</span> <span class="n">st</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_displays&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">displays</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Size</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;The configured displays.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">map_display</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Display</span><span class="p">:</span>
+            <span class="n">targ</span> <span class="o">=</span> <span class="n">Extent</span><span class="p">(</span><span class="o">**</span><span class="n">fac</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">_target&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">asdict</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">Display</span><span class="p">(</span><span class="o">**</span><span class="n">fac</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span> <span class="o">|</span>
+                           <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">targ</span><span class="p">})</span>
+
+        <span class="n">fac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">map_display</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_names</span><span class="p">)}</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_displays_by_size&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">displays_by_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Size</span><span class="p">,</span> <span class="n">Display</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;A dictionary of displays keyed by size.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">Size</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">height</span><span class="p">):</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+
+<div class="viewcode-block" id="BrowserManager.show"><a class="viewcode-back" href="../../../api/zensols.showfile.html#zensols.showfile.browser.BrowserManager.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">extent</span><span class="p">:</span> <span class="n">Extent</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display ``locator`` content on the screen and optionally resize the</span>
+<span class="sd">        window to ``extent``.</span>
+
+<span class="sd">        :param locator: the PDF (or image) file or URL to display</span>
+
+<span class="sd">        :param extent: the position and size of the window after browsing</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">extent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">screen</span><span class="p">:</span> <span class="n">Size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">screen_size</span>
+            <span class="n">display</span><span class="p">:</span> <span class="n">Display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displays_by_size</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">screen</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;detected: </span><span class="si">{</span><span class="n">screen</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">display</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;no display entry for bounds: </span><span class="si">{</span><span class="n">screen</span><span class="si">}</span><span class="s1">--using default&#39;</span><span class="p">)</span>
+                <span class="n">extent</span> <span class="o">=</span> <span class="n">Extent</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">extent</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locator</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">locator</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No file found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">show_file</span><span class="p">(</span><span class="n">locator</span><span class="p">,</span> <span class="n">extent</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">show_url</span><span class="p">(</span><span class="n">locator</span><span class="p">,</span> <span class="n">extent</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Paul Landes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+<map id="inheritance460cef46fd" name="inheritance460cef46fd">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="25,5,97,31"/>
+<area shape="rect" id="node7" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="25,79,97,104"/>
+<area shape="rect" id="node2" title="Base exception from which almost all library raised errors extend." alt="" coords="143,5,217,31"/>
+<area shape="rect" id="node3" href="#zensols.showfile.darwin.ApplescriptError" target="_top" title="Raised for macOS errors." alt="" coords="121,79,239,104"/>
+<area shape="rect" id="node4" href="#zensols.showfile.browser.Browser" target="_top" title="Browser()" alt="" coords="25,225,97,251"/>
+<area shape="rect" id="node6" href="#zensols.showfile.darwin.DarwinBrowser" target="_top" title="DarwinBrowser(config_factory: zensols.config.facbase.ConfigFactory, script_paths: Dict[str, pathlib.Path], applescript_warns: Dict[str, str] = &lt;factory&gt;, switch_back_app: str = None)" alt="" coords="5,299,117,324"/>
+<area shape="rect" id="node5" title="A class that that generates a dictionary recursively from data classes and" alt="" coords="25,152,97,177"/>
+<area shape="rect" id="node8" title="Generic enumeration." alt="" coords="267,5,339,31"/>
+<area shape="rect" id="node9" href="#zensols.showfile.darwin.ErrorType" target="_top" title="Types of errors raised by :class:`.ApplescriptError`." alt="" coords="263,79,343,104"/>
+</map>

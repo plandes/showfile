@@ -1,0 +1,7 @@
+<map id="inheritance67628048a4" name="inheritance67628048a4">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="19,5,91,31"/>
+<area shape="rect" id="node4" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="19,79,91,104"/>
+<area shape="rect" id="node2" href="#zensols.showfile.browser.Browser" target="_top" title="Browser()" alt="" coords="19,225,91,251"/>
+<area shape="rect" id="node5" href="#zensols.showfile.default.WebBrowser" target="_top" title="A class that displays a file or URL in a web browser." alt="" coords="5,299,104,324"/>
+<area shape="rect" id="node3" title="A class that that generates a dictionary recursively from data classes and" alt="" coords="19,152,91,177"/>
+</map>

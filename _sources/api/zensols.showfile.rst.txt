@@ -1,0 +1,63 @@
+zensols.showfile package
+========================
+
+Submodules
+----------
+
+zensols.showfile.app
+--------------------
+.. inheritance-diagram:: zensols.showfile.app
+   :parts: 1
+
+.. automodule:: zensols.showfile.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.showfile.browser
+------------------------
+.. inheritance-diagram:: zensols.showfile.browser
+   :parts: 1
+
+.. automodule:: zensols.showfile.browser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.showfile.cli
+--------------------
+.. inheritance-diagram:: zensols.showfile.cli
+   :parts: 1
+
+.. automodule:: zensols.showfile.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.showfile.darwin
+-----------------------
+.. inheritance-diagram:: zensols.showfile.darwin
+   :parts: 1
+
+.. automodule:: zensols.showfile.darwin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.showfile.default
+------------------------
+.. inheritance-diagram:: zensols.showfile.default
+   :parts: 1
+
+.. automodule:: zensols.showfile.default
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.showfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
